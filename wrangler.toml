@@ -1,0 +1,11 @@
+name = "cbi-flag"
+type = "javascript"
+zone_id = "64aa795d961b5c803a60bda033344016"
+account_id = "9262787c68d7352f646339a19d3f9aef"
+route = "cbi.christopher.xyz"
+workers_dev = true
+
+[build]
+command = "npm install && npm run build"
+[build.upload]
+format = "service-worker"
