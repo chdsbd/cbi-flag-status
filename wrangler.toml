@@ -5,6 +5,25 @@ account_id = "9262787c68d7352f646339a19d3f9aef"
 route = "cbi.christopher.xyz"
 workers_dev = true
 
+kv_namespaces = [
+  { binding = "FLAG_HISTORY", id = "313f9b9a4e6a488db8a8a0a5ee2ddd24"},
+]
+
+[vars]
+PUSHOVER_SUBSCRIPTION_CODE = "CBI-7ubq8djirejskeb"
+
+# [secrets]
+# PUSHOVER_APP_TOKEN
+# PUSHOVER_USER_ID
+
+[triggers]
+crons = [
+    # 9am to 9pm EDT
+    "* 0-1,13-23 * * *",
+]
+
+
+
 [build]
 command = "npm install && npm run build"
 [build.upload]
