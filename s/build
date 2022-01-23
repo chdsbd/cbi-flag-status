@@ -1,0 +1,13 @@
+#!/bin/sh
+set -o errexit
+set -o nounset
+
+main() {
+    echo "removing old deploy zip & clearing build dir"
+    rm -rf dist
+    echo "compiling source files"
+    ./node_modules/.bin/esbuild src/index.ts --platform=node --bundle --minify --sourcemap --target=node12 --outfile=dist/worker.js
+    echo "done"
+}
+
+main "$@"
