@@ -4,9 +4,10 @@ zone_id = "64aa795d961b5c803a60bda033344016"
 account_id = "9262787c68d7352f646339a19d3f9aef"
 route = "cbi.christopher.xyz"
 workers_dev = true
+compatibility_date = "2022-01-24"
 
 kv_namespaces = [
-  { binding = "FLAG_HISTORY", id = "313f9b9a4e6a488db8a8a0a5ee2ddd24"},
+  { binding = "FLAG_HISTORY", id = "313f9b9a4e6a488db8a8a0a5ee2ddd24", preview_id = "preview"},
 ]
 
 [vars]
