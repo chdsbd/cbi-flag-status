@@ -1,26 +1,14 @@
 import React from 'react'
 import * as CBI from '../cbi-api'
 import { renderToStaticMarkup } from 'react-dom/server.browser'
+import { differenceInCalendarDays, isBefore, isAfter } from 'date-fns'
 
-function responseBody(color: string | null) {
-  const title = color == null ? 'CBI Closed' : `flag color (${color})`
-  const element = (
-    <html>
-      <head>
-        <meta http-equiv="refresh" content="60" />
-        <title>{title}</title>
-      </head>
-
-      <body
-        style={{
-          height: '100%',
-          width: '100%',
-          backgroundColor: color ?? undefined,
-        }}
-      >
-        {/* <!-- https://pushover.net/api/subscriptions#buttons --> */}
-        <style type="text/css">
-          {`
+function PushoverButton() {
+  // https://pushover.net/api/subscriptions#buttons
+  return (
+    <>
+      <style type="text/css">
+        {`
   .pushover_button {
     box-sizing: border-box !important;
     display: inline-block;
@@ -45,14 +33,55 @@ function responseBody(color: string | null) {
     vertical-align: middle !important;
     height: 22px !important;
   }`}
-        </style>
+      </style>
+      <a
+        className="pushover_button"
+        style={{
+          position: 'absolute',
+          top: 10,
+          left: 10,
+        }}
+        href={`https://pushover.net/subscribe/${PUSHOVER_SUBSCRIPTION_CODE}`}
+      >
+        Subscribe With Pushover
+      </a>
+    </>
+  )
+}
 
-        <a
-          className="pushover_button"
-          href={`https://pushover.net/subscribe/${PUSHOVER_SUBSCRIPTION_CODE}`}
-        >
-          Subscribe With Pushover
-        </a>
+function responseBody(color: string | null) {
+  const now = Date.now()
+  const openingDay = new Date(new Date().getFullYear(), 3, 1) // April 1
+  const closingDay = new Date(new Date().getFullYear(), 10, 1) // Nov 1
+  const isOpen = isAfter(now, openingDay) && isBefore(now, closingDay)
+  const daysUntil = differenceInCalendarDays(now, openingDay)
+  const countDownText = `T${daysUntil} Days`
+
+  const subtitle = isOpen ? color || 'closed' : countDownText
+
+  const element = (
+    <html
+      style={{
+        height: '100%',
+        fontFamily: `BlinkMacSystemFont, -apple-system, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Fira Sans", "Droid Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;`,
+      }}
+    >
+      <head>
+        <meta http-equiv="refresh" content="60" />
+        <title>{subtitle} | Flag Status</title>
+      </head>
+      <body
+        style={{
+          height: '100%',
+          width: '100%',
+          backgroundColor: color ?? undefined,
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}
+      >
+        {!isOpen && <h1>{countDownText}</h1>}
+        <PushoverButton />
       </body>
     </html>
   )
