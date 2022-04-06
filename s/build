@@ -6,7 +6,15 @@ main() {
     echo "removing old deploy zip & clearing build dir"
     rm -rf dist
     echo "compiling source files"
-    ./node_modules/.bin/esbuild src/index.ts --platform=node --bundle --minify --sourcemap --target=es2020,safari11 --outfile=dist/worker.js '--define:process.env.NODE_ENV="production"'
+    ./node_modules/.bin/esbuild src/worker.ts \
+      --platform=node \
+      --bundle \
+      --minify \
+      --sourcemap \
+      --loader:.png=file \
+      --target=es2020,safari11 \
+      --outdir=dist \
+      '--define:process.env.NODE_ENV="production"'
     echo "done"
 }
 

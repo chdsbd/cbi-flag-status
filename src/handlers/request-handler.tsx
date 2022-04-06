@@ -2,6 +2,14 @@ import React from 'react'
 import * as CBI from '../cbi-api'
 import { renderToStaticMarkup } from 'react-dom/server.browser'
 import { differenceInCalendarDays, isBefore, isAfter } from 'date-fns'
+import redImage from '../public/red.png'
+import greenImage from '../public/green.png'
+import yellowImage from '../public/yellow.png'
+import { getAssetFromKV } from '@cloudflare/kv-asset-handler'
+
+function assertNever(arg: never): never {
+  throw Error(`expected never, got: ${arg}`)
+}
 
 function PushoverButton() {
   // https://pushover.net/api/subscriptions#buttons
@@ -49,7 +57,27 @@ function PushoverButton() {
   )
 }
 
-function responseBody(color: string | null) {
+function MetaImage({ color }: { readonly color: Color }) {
+  const metaUrl =
+    color === 'green'
+      ? greenImage
+      : color === 'yellow'
+      ? yellowImage
+      : color === 'red'
+      ? redImage
+      : assertNever(color)
+  return (
+    <>
+      <meta property="og:image:width" content="1200" />
+      <meta property="og:image:height" content="1200" />
+      <meta property="og:image" content={metaUrl} />
+    </>
+  )
+}
+
+type Color = 'red' | 'green' | 'yellow'
+
+function responseBody(color: Color | null) {
   const now = Date.now()
   const openingDay = new Date(new Date().getFullYear(), 3, 1) // April 1
   const closingDay = new Date(new Date().getFullYear(), 10, 1) // Nov 1
@@ -69,6 +97,7 @@ function responseBody(color: string | null) {
       <head>
         <meta http-equiv="refresh" content="60" />
         <title>{subtitle} | Flag Status</title>
+        {color != null && <MetaImage color={color} />}
       </head>
       <body
         style={{
@@ -89,7 +118,24 @@ function responseBody(color: string | null) {
   return `<!DOCTYPE html>` + renderToStaticMarkup(element)
 }
 
-export async function handleRequest(request: Request): Promise<Response> {
+// see: https://developers.cloudflare.com/workers/platform/sites/start-from-worker/
+async function serveStaticFiles(event: FetchEvent) {
+  try {
+    return await getAssetFromKV(event)
+  } catch (e) {
+    const pathname = new URL(event.request.url).pathname
+    return new Response(`"${pathname}" not found`, {
+      status: 404,
+      statusText: 'not found',
+    })
+  }
+}
+
+export async function handleRequest(event: FetchEvent): Promise<Response> {
+  const request = event.request
+  if (request.url.endsWith('.png')) {
+    return serveStaticFiles(event)
+  }
   const color = await CBI.flagColor()
   return new Response(responseBody(color), {
     headers: {
