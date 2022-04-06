@@ -5,8 +5,8 @@
   "main": "dist/worker.js",
   "scripts": {
     "build": "./s/build",
-    "format": "prettier --write  '*.{json,js}' 'src/**/*.{js,ts}' 'test/**/*.{js,ts}'",
-    "lint": "eslint --max-warnings=0 src && prettier --check '*.{json,js}' 'src/**/*.{js,ts}' 'test/**/*.{js,ts}'"
+    "format": "prettier --write  '*.{json,js}' 'src/**/*.{js,tsx,ts}'",
+    "lint": "eslint --max-warnings=0 src && prettier --check '*.{json,js}' 'src/**/*.{js,ts,tsx}'"
   },
   "author": "author",
   "license": "MIT OR Apache-2.0",
@@ -35,6 +35,7 @@
     "typescript": "^4.3.2"
   },
   "dependencies": {
+    "@cloudflare/kv-asset-handler": "^0.2.0",
     "fp-ts": "^2.10.5",
     "io-ts": "^2.2.16"
   }
